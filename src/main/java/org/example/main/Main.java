@@ -1,5 +1,7 @@
 package org.example.main;
 
+import org.example.pecas.Peao;
+
 import javax.swing.*;
 
 public class Main {
@@ -10,11 +12,14 @@ public class Main {
         //adicionando GamePanel para o main
         GamePanel gp  = new GamePanel();//aqio chama a classe e instacia ela
         window.add(gp);//em seguida adicionamos ela
-        window.pack();//e compactamos ela para seu tamanho
+        window.pack();//e compactamos o tamanho
 
         window.setLocationRelativeTo(null);//aqui para deixar a janela no centro da tela
         window.setVisible(true);//para aparecer a janela
 
         gp.launchGame();//chamando o launchGame
+
+        System.out.println(Peao.class.getResource("/pecas/peaoB.png"));
+        System.out.println(Peao.class.getResource("/pecas/peaoP.png"));
     }
 }
