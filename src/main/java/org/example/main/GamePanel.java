@@ -61,13 +61,13 @@
             pecas.add(new Peao(White, 6, 6));
             pecas.add(new Peao(White, 7, 6));
             pecas.add(new Torre(White, 0, 7));
-            pecas.add(new Torre(White, 7, 7));
+            pecas.add(new Torre(White, 7, 4));
             pecas.add(new Cavalo(White, 1, 7));
             pecas.add(new Cavalo(White, 6, 7));
             pecas.add(new Bispo(White, 5, 7));
             pecas.add(new Bispo(White, 2, 7));
             pecas.add(new Rainha(White, 3, 7));
-            pecas.add(new Rei(White, 4, 4 ));
+            pecas.add(new Rei(White, 4, 7 ));
 
 
             //time preto

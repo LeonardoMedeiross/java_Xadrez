@@ -12,4 +12,16 @@ public class Torre extends Pecas{
             image = getImage("/pecas/TorreP.png");
         }
     }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isForaDoTabuleiro(targetCol,targetRow) && isMesmoSquare(targetCol,targetRow)== false){
+            if (targetCol == preCol || targetRow == preRow){
+            if (isValidSquare(targetCol,targetRow) && pieceIsOnStrainghtLine(targetCol,targetRow) == false){
+                return true;
+            }
+            }
+        }
+        return false ;
+    }
 }

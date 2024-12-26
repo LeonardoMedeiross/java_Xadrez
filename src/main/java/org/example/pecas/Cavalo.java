@@ -12,4 +12,22 @@ public class Cavalo extends Pecas{
             image = getImage("/pecas/cavaloP.png");
         }
     }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+
+        if (isForaDoTabuleiro(targetCol,targetRow)){
+        //cavalo anda 2 para vertical em forma de L , 1:2 ou 2: 1
+            if (Math.abs(targetCol - preCol)*Math.abs(targetRow - preRow)==2){
+                if (isValidSquare(targetCol,targetRow)){
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
+
+
+ }
 }

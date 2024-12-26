@@ -87,6 +87,12 @@ public class Pecas {
 
         return false;
     }
+
+    public boolean isMesmoSquare (int targetCol , int targetRow ){
+        if(targetCol == preCol && targetRow == preRow){
+            return true;
+        }return false;
+    }
     public Pecas getHitting(int targetCol , int targetRow){
         for (Pecas pecas : GamePanel.simPecas){
             if (pecas.col == targetCol && pecas.row ==targetRow && pecas != this){
@@ -112,6 +118,59 @@ public class Pecas {
 
         return false ;
     }
+
+    public boolean pieceIsOnStrainghtLine(int targetCol, int targetRow) {
+        // Verificar movimento para a esquerda
+        if (targetCol < preCol) { // Movimento para a esquerda
+            for (int c = preCol - 1; c > targetCol; c--) {
+                for (Pecas p : GamePanel.simPecas) {
+                    if (p.col == c && p.row == preRow) { // Checa peça no mesmo nível
+                        hittingP = p;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Verificar movimento para a direita
+        if (targetCol > preCol) { // Movimento para a direita
+            for (int c = preCol + 1; c < targetCol; c++) {
+                for (Pecas p : GamePanel.simPecas) {
+                    if (p.col == c && p.row == preRow) { // Checa peça no mesmo nível
+                        hittingP = p;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Verificar movimento para cima
+        if (targetRow < preRow) { // Movimento para cima
+            for (int r = preRow - 1; r > targetRow; r--) {
+                for (Pecas p : GamePanel.simPecas) {
+                    if (p.col == preCol && p.row == r) { // Checa peça na mesma coluna
+                        hittingP = p;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Verificar movimento para baixo
+        if (targetRow > preRow) { // Movimento para baixo
+            for (int r = preRow + 1; r < targetRow; r++) {
+                for (Pecas p : GamePanel.simPecas) {
+                    if (p.col == preCol && p.row == r) { // Checa peça na mesma coluna
+                        hittingP = p;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false; // Nenhuma peça foi encontrada no caminho
+    }
+
     public boolean isForaDoTabuleiro(int targetCol ,int targetRow){
         //aqui significa se o targecol for maior ou igual a 0 e menor ou igual a 7 está dentro do tabuleiro
         //a mesma coisa se aplica para targetRow
