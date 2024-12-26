@@ -12,4 +12,19 @@ public class Rei extends Pecas{
             image = getImage("/pecas/reiRá.png");
         }
     }
+
+    public boolean canMove(int targetCol ,int targetRow){
+        if (isForaDoTabuleiro(targetCol,targetRow)){
+
+            if (Math.abs(targetCol-preCol)+Math.abs(targetRow - preRow)==1 ||
+                  Math.abs(targetCol-preCol) * Math.abs(targetRow -preRow) ==1
+            ){
+                if (isValidSquare(targetCol,targetRow)){
+                return true;
+                    }
+            }
+
+        }
+        return false;
+    }
 }
