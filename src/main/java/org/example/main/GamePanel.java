@@ -66,7 +66,7 @@
             pecas.add(new Cavalo(White, 6, 7));
             pecas.add(new Bispo(White, 5, 7));
             pecas.add(new Bispo(White, 2, 7));
-            pecas.add(new Rainha(White, 3, 7));
+            pecas.add(new Rainha(White, 3, 4));
             pecas.add(new Rei(White, 4, 7 ));
 
 
