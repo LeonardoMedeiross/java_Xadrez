@@ -13,4 +13,17 @@ public class Bispo extends Pecas{
             image = getImage("/pecas/bispoP.png");
         }
     }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isForaDoTabuleiro(targetCol,targetRow)&& isMesmoSquare(targetCol, targetRow)== false){
+            if (Math.abs(targetCol - preCol) == Math.abs(targetRow - preRow)){
+                if (isValidSquare(targetCol,targetRow)&& pecaNaLinhaDiagonal(targetCol,targetRow)== false){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

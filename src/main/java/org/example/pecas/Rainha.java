@@ -12,4 +12,12 @@ public class Rainha extends Pecas{
             image = getImage("/pecas/rainhaP.png");
         }
     }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isForaDoTabuleiro(targetCol,targetRow)&& isMesmoSquare(targetCol, targetRow)== false){
+
+        }
+        return false;
+    }
 }

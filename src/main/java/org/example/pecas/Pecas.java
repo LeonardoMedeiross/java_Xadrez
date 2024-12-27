@@ -171,6 +171,61 @@ public class Pecas {
         return false; // Nenhuma peça foi encontrada no caminho
     }
 
+    public boolean pecaNaLinhaDiagonal(int targetCol , int targetRow){
+        if (targetRow < preRow){
+            // cima esquerda
+        for (   int c = preCol - 1 ; c > targetCol ; c --){
+            int diff = Math.abs(c - preCol);
+            for (Pecas p : GamePanel.simPecas){
+                if (p.col == c && p.row ==preRow - diff){
+                    hittingP = p ;
+                    return true ;
+                }
+            }
+
+        }
+            //cima direita
+            for (   int c = preCol + 1 ; c < targetCol ; c ++){
+                int diff = Math.abs(c - preCol);
+                for (Pecas p : GamePanel.simPecas){
+                    if (p.col == c && p.row ==preRow - diff){
+                        hittingP = p ;
+                        return true ;
+                    }
+                }
+
+            }
+        }
+        if (targetRow > preRow){
+            //baixo esquerda
+            for (   int c = preCol - 1 ; c > targetCol ; c --){
+                int diff = Math.abs(c - preCol);
+                for (Pecas p : GamePanel.simPecas){
+                    if (p.col == c && p.row ==preRow - diff){
+                        hittingP = p ;
+                        return true ;
+                    }
+                }
+
+            }
+
+            // baixo direita
+            for (   int c = preCol + 1 ; c < targetCol ; c ++){
+                int diff = Math.abs(c - preCol);
+                for (Pecas p : GamePanel.simPecas){
+                    if (p.col == c && p.row ==preRow - diff){
+                        hittingP = p ;
+                        return true ;
+                    }
+                }
+
+            }
+        }
+
+
+        return false;
+    }
+
     public boolean isForaDoTabuleiro(int targetCol ,int targetRow){
         //aqui significa se o targecol for maior ou igual a 0 e menor ou igual a 7 está dentro do tabuleiro
         //a mesma coisa se aplica para targetRow
