@@ -156,8 +156,8 @@
                             activeP.updatePosition();
                             copyPecas(simPecas,pecas);
 
-                            //alterana o jogador
-                           // currentColor = (currentColor == White) ? Black : White ;
+                            //troca de turno
+                            trocaDeTurno();
 
                         } else {
                             //reseta a posição se for invalido
@@ -190,6 +190,15 @@
                 canMove = true ;
                 validSquare = true ;
             }
+        }
+
+            private void trocaDeTurno (){
+            if ( currentColor == White){
+                currentColor = Black ;
+            }else {
+                currentColor = White;
+            }
+            activeP =null ;
         }
 
         //o paintComponet lida com tudo que é desenhavel no programa
