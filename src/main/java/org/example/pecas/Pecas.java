@@ -14,6 +14,7 @@ public class Pecas {
     public int col, row, preCol, preRow;
     public int color;
     public Pecas hittingP ;
+    public  boolean moved ;
 
     // Construtor
     public Pecas(int color, int col, int row) {
@@ -74,6 +75,9 @@ public class Pecas {
         //aqui quando o movimento é confirmado atualiza as colunas e as linhas anteriores
         preCol=getCol(x);
         preRow=getRow(y);
+
+        //para verificar se o peao já andou ou não
+            moved = true ;
     }
     public void resetPosition(){
 
