@@ -4,12 +4,15 @@
 
     import javax.swing.*;
     import java.awt.*;
+    import java.awt.image.BufferedImage;
+    import java.io.File;
     import java.util.ArrayList;
 
     //aqui iremos definir o tamanho da tela, cor de fundo
     public class GamePanel extends JPanel implements Runnable {
         public static final int WIDTH = 1100;
         public static final int HEIGHT = 800;
+        public static Pecas castlingP;
         final int FPS = 60;
         Thread gameThread; //para poder usar o Thread tem que implementar o interface Runnable
         Tabuleiro board = new Tabuleiro();//instanciando o tabuleiro
@@ -18,7 +21,7 @@
         //Peças
         public static ArrayList<Pecas> pecas = new ArrayList<>();//essa é mais como uma lista de back up
         public static ArrayList<Pecas> simPecas = new ArrayList<>();//usaremos mais o simPecas
-        Pecas activeP;
+        Pecas activeP ;
 
         //cor das peças
         public static final int White = 0;//0 esta definindo as peças em branco
@@ -152,6 +155,10 @@
                                 simPecas.remove(activeP.hittingP.getIndex());
                                 activeP.hittingP = null ;
                             }
+
+                            if (castlingP !=null ){
+                                castlingP.updatePosition();
+                            }
                             //atualiza posição da peça ativa
                             activeP.updatePosition();
                             copyPecas(simPecas,pecas);
@@ -178,6 +185,13 @@
             //copia as peças para simluação
             copyPecas(simPecas, pecas);
 
+            //reseta o castling
+            if (castlingP != null){
+                castlingP.col = castlingP.preCol;
+                castlingP.x =castlingP.getX(castlingP.col);
+                castlingP = null ;
+            }
+
             //se o jogador soltou , atualiza a posição
             activeP.x = mouse.x - Tabuleiro.SQUARE_SIZE;
             activeP.y = mouse.y - Tabuleiro.SQUARE_SIZE;
@@ -189,6 +203,7 @@
 
                 canMove = true ;
                 validSquare = true ;
+                checkCastling();
             }
         }
 
@@ -199,6 +214,18 @@
                 currentColor = White;
             }
             activeP =null ;
+        }
+
+        private void checkCastling(){
+            if (castlingP != null){
+                if (castlingP.col == 0){
+                castlingP.col +=3 ;
+                }
+                else if (castlingP.col == 7){
+                    castlingP.col -= 2 ;
+                }
+                castlingP.x = castlingP.getX(castlingP.col);
+            }
         }
 
         //o paintComponet lida com tudo que é desenhavel no programa
@@ -227,5 +254,28 @@
                 //
                 activeP.draw(g2);
             }
+         /* //marik imagem
+            ImageIcon icon = new ImageIcon(getClass().getResource("Chess/personagens/marikOnGame.png"));
+            if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
+                System.out.println("Imagem carregada com sucesso!");
+            } else {
+                System.out.println("Falha ao carregar a imagem.");
+            }
+
+            g2.drawImage(icon.getImage(),WIDTH - 800, 410,250 , 250 , null);*/
+
+
+
+            //status de mensagem
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g2.setFont(new Font("Book  Antiqua", Font.ROMAN_BASELINE,40));
+            g2.setColor(Color.WHITE);
+
+            if (currentColor == White){
+                g2.drawString("Turno do Branco ", 800, 410);
+            }else {
+                g2.drawString("Turno do Preto", 800,410);
+            }
+
         }
     }
