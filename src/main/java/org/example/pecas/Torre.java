@@ -1,10 +1,12 @@
 package org.example.pecas;
 
 import org.example.main.GamePanel;
+import org.example.main.Tipo;
 
 public class Torre extends Pecas{
     public Torre(int color, int col, int row) {
         super(color, col, row);
+        tipo= Tipo.Torre;
 
         if (color == GamePanel.White){
             image = getImage("/pecas/TorreB.png");

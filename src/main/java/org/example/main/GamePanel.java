@@ -210,8 +210,22 @@
             private void trocaDeTurno (){
             if ( currentColor == White){
                 currentColor = Black ;
+                //resetando as peças pretas no en passant
+                for (Pecas p : pecas){
+                    if (p.color ==Black){
+                        p.duasCasas = false;
+                    }
+                }
             }else {
                 currentColor = White;
+
+                //resetando as peças brancas no en passant
+                for (Pecas p : pecas){
+                    if (p.color ==White){
+                        p.duasCasas = false;
+                    }
+                }
+
             }
             activeP =null ;
         }
@@ -254,15 +268,9 @@
                 //
                 activeP.draw(g2);
             }
-         /* //marik imagem
-            ImageIcon icon = new ImageIcon(getClass().getResource("Chess/personagens/marikOnGame.png"));
-            if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
-                System.out.println("Imagem carregada com sucesso!");
-            } else {
-                System.out.println("Falha ao carregar a imagem.");
-            }
-
-            g2.drawImage(icon.getImage(),WIDTH - 800, 410,250 , 250 , null);*/
+         //marik imagem
+            ImageIcon icon = new ImageIcon(getClass().getResource("/pecas/marik200x200.png"));
+            g2.drawImage(icon.getImage(),WIDTH - 250, 20,200, 200 , null);
 
 
 

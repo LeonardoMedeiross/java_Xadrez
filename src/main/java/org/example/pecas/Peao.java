@@ -1,10 +1,12 @@
 package org.example.pecas;
 
 import org.example.main.GamePanel;
+import org.example.main.Tipo;
 
 public class Peao extends Pecas {
     public Peao(int color, int col, int row) {
         super(color, col, row);
+        tipo = Tipo.Peao;
         if (color == GamePanel.White) {
             image = getImage("/pecas/peaoB.png");
         } else {
@@ -37,6 +39,15 @@ public class Peao extends Pecas {
             //movimento em diagonal para comer a peça do adversario e ficar ali
             if (Math.abs(targetCol - preCol)== 1 && targetRow == preRow + moveValue && hittingP !=null && hittingP.color != color){
                 return true ;
+            }
+            //en passant
+            if (Math.abs(targetCol - preCol)== 1 && targetRow == preRow + moveValue) {
+                for (Pecas pecas : GamePanel.simPecas){
+                    if (pecas.col == targetCol && pecas.row == preRow && pecas.duasCasas == true){
+                            hittingP = pecas ;
+                            return true;
+                    }
+                }
             }
         }
         return false;

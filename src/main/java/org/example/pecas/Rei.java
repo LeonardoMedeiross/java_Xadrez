@@ -1,10 +1,12 @@
 package org.example.pecas;
 
 import org.example.main.GamePanel;
+import org.example.main.Tipo;
 
 public class Rei extends Pecas{
     public Rei(int color, int col, int row) {
         super(color, col, row);
+        tipo= Tipo.Rei;
 
         if (color == GamePanel.White) {
             image = getImage("/pecas/reiB.png");

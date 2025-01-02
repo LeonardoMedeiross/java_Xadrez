@@ -2,6 +2,7 @@ package org.example.pecas;
 
 import org.example.main.GamePanel;
 import org.example.main.Tabuleiro;
+import org.example.main.Tipo;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -9,12 +10,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Pecas {
+    public Tipo tipo ;
     public BufferedImage image;
     public int x, y;
     public int col, row, preCol, preRow;
     public int color;
     public Pecas hittingP ;
     public  boolean moved ;
+    public boolean duasCasas;
 
     // Construtor
     public Pecas(int color, int col, int row) {
@@ -68,6 +71,13 @@ public class Pecas {
         }return 0;
     }
     public void updatePosition(){
+        //verificando en Passant
+        if (tipo == Tipo.Peao){
+            if (Math.abs(row - preRow)==2){
+                duasCasas = true ;
+            }
+        }
+
         //ajutando a posição quando solta o botão do mouse
         x=getX(col);
         y=getY(row);
