@@ -19,7 +19,6 @@ public class Main {
 
         gp.launchGame();//chamando o launchGame
 
-        System.out.println(Peao.class.getResource("/pecas/peaoB.png"));
-        System.out.println(Peao.class.getResource("/pecas/peaoP.png"));
+        
     }
 }
