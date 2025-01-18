@@ -55,22 +55,22 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setPecas() {
         //time branco
-        pecas.add(new Peao(White, 0, 6));
-        pecas.add(new Peao(White, 1, 6));
-        pecas.add(new Peao(White, 2, 6));
-        pecas.add(new Peao(White, 3, 6));
-        pecas.add(new Peao(White, 4, 6));
-        pecas.add(new Peao(White, 5, 6));
-        pecas.add(new Peao(White, 6, 6));
+      //  pecas.add(new Peao(White, 0, 6));
+       // pecas.add(new Peao(White, 1, 6));
+       // pecas.add(new Peao(White, 2, 6));
+       // pecas.add(new Peao(White, 3, 6));
+       // pecas.add(new Peao(White, 4, 6));
+       // pecas.add(new Peao(White, 5, 6));
+      //  pecas.add(new Peao(White, 6, 6));
         pecas.add(new Peao(White, 7, 6));
-        pecas.add(new Torre(White, 0, 7));
-        pecas.add(new Torre(White, 7, 7));
-        pecas.add(new Cavalo(White, 1, 7));
-        pecas.add(new Cavalo(White, 6, 7));
-        pecas.add(new Bispo(White, 5, 7));
-        pecas.add(new Bispo(White, 2, 7));
-        pecas.add(new Rainha(White, 3, 7));
-        pecas.add(new Rei(White, 4, 7 ));
+      //  pecas.add(new Torre(White, 0, 7));
+       // pecas.add(new Torre(White, 7, 7));
+      //  pecas.add(new Cavalo(White, 1, 7));
+      //  pecas.add(new Cavalo(White, 6, 7));
+     //   pecas.add(new Bispo(White, 5, 7));
+      //  pecas.add(new Bispo(White, 2, 7));
+      //  pecas.add(new Rainha(White, 3, 7));
+        pecas.add(new Rei(White, 3, 7 ));
 
 
         //time preto
@@ -87,8 +87,8 @@ public class GamePanel extends JPanel implements Runnable {
         pecas.add(new Cavalo(Black, 1, 0));
         pecas.add(new Cavalo(Black, 6, 0));
         pecas.add(new Bispo(Black, 5, 0));
-        pecas.add(new Bispo(Black, 2, 0));
-        pecas.add(new Rainha(Black, 3, 0));
+        pecas.add(new Bispo(Black, 1, 4));
+        pecas.add(new Rainha(Black, 4, 5));
         pecas.add(new Rei(Black, 4, 0));
     }
 
@@ -238,7 +238,21 @@ public class GamePanel extends JPanel implements Runnable {
             canMove = true ;
             validSquare = true ;
             checkCastling();
+
+            if (isIllegal(activeP)==false){
+                validSquare = true ;
+            }
         }
+    }
+    public boolean isIllegal(Pecas rei){
+        if (rei.tipo == Tipo.Rei){
+            for (Pecas p : simPecas){
+                if (p != rei && p.color != rei.color && p.canMove(rei.col,rei.row)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void trocaDeTurno (){
@@ -291,11 +305,16 @@ public class GamePanel extends JPanel implements Runnable {
         }
         if (activeP != null) {
             if (canMove){
-                g2.setColor(Color.WHITE);
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
-                g2.fillRect(activeP.col * Tabuleiro.SQUARE_SIZE, activeP.row * Tabuleiro.SQUARE_SIZE,
-                        Tabuleiro.SQUARE_SIZE, Tabuleiro.SQUARE_SIZE);
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+                if (isIllegal(activeP)){  g2.setColor(Color.GRAY);
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+                    g2.fillRect(activeP.col * Tabuleiro.SQUARE_SIZE, activeP.row * Tabuleiro.SQUARE_SIZE,
+                            Tabuleiro.SQUARE_SIZE, Tabuleiro.SQUARE_SIZE);
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));}else {g2.setColor(Color.WHITE);
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+                    g2.fillRect(activeP.col * Tabuleiro.SQUARE_SIZE, activeP.row * Tabuleiro.SQUARE_SIZE,
+                            Tabuleiro.SQUARE_SIZE, Tabuleiro.SQUARE_SIZE);
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));}
+
             }
 
 
