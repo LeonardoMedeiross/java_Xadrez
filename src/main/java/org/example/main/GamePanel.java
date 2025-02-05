@@ -4,8 +4,6 @@ import org.example.pecas.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 
 //aqui iremos definir o tamanho da tela, cor de fundo
@@ -21,7 +19,7 @@ public class GamePanel extends JPanel implements Runnable {
     //Peças
     public static ArrayList<Pecas> pecas = new ArrayList<>();//essa é mais como uma lista de back up
     public static ArrayList<Pecas> simPecas = new ArrayList<>();//usaremos mais o simPecas
-    Pecas activeP ;
+    Pecas activeP, checkingP;
 
     //cor das peças
     public static final int White = 0;//0 esta definindo as peças em branco
@@ -31,6 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     //Booleanos
     boolean canMove;
     boolean validSquare;
+    boolean gameover;
 
     public GamePanel() {
         //tamanho e cor de fundo
@@ -55,22 +54,22 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setPecas() {
         //time branco
-      //  pecas.add(new Peao(White, 0, 6));
-       // pecas.add(new Peao(White, 1, 6));
-       // pecas.add(new Peao(White, 2, 6));
-       // pecas.add(new Peao(White, 3, 6));
-       // pecas.add(new Peao(White, 4, 6));
-       // pecas.add(new Peao(White, 5, 6));
-      //  pecas.add(new Peao(White, 6, 6));
+        //  pecas.add(new Peao(White, 0, 6));
+        // pecas.add(new Peao(White, 1, 6));
+        // pecas.add(new Peao(White, 2, 6));
+        // pecas.add(new Peao(White, 3, 6));
+        // pecas.add(new Peao(White, 4, 6));
+        // pecas.add(new Peao(White, 5, 6));
+        //  pecas.add(new Peao(White, 6, 6));
         pecas.add(new Peao(White, 7, 6));
-      //  pecas.add(new Torre(White, 0, 7));
-       // pecas.add(new Torre(White, 7, 7));
-      //  pecas.add(new Cavalo(White, 1, 7));
-      //  pecas.add(new Cavalo(White, 6, 7));
-     //   pecas.add(new Bispo(White, 5, 7));
-      //  pecas.add(new Bispo(White, 2, 7));
-      //  pecas.add(new Rainha(White, 3, 7));
-        pecas.add(new Rei(White, 3, 7 ));
+        //  pecas.add(new Torre(White, 0, 7));
+        // pecas.add(new Torre(White, 7, 7));
+        //  pecas.add(new Cavalo(White, 1, 7));
+        //  pecas.add(new Cavalo(White, 6, 7));
+        //   pecas.add(new Bispo(White, 5, 7));
+        //  pecas.add(new Bispo(White, 2, 7));
+        //  pecas.add(new Rainha(White, 3, 7));
+        pecas.add(new Rei(White, 3, 7));
 
 
         //time preto
@@ -145,30 +144,41 @@ public class GamePanel extends JPanel implements Runnable {
                 //seria uma fase de pensamento antes de soltar para jogar
                 simulate();
             }
-        }else {
+        } else {
             //soltando o mouse
             if (mouse.clicar == false) {
                 if (activeP != null) {
                     if (validSquare) {
                         // captura a peça
-                        if (activeP.hittingP !=null){
+                        if (activeP.hittingP != null) {
                             simPecas.remove(activeP.hittingP.getIndex());
-                            activeP.hittingP = null ;
+                            activeP.hittingP = null;
                         }
+                        if (isReiEstaEnCheck()) {
+                        }
+                        //TODO : possivel game over
+                        /*}else {
+                            // Verifica e promove o peão, se aplicável
+                            handlePeaoPromotion(activeP);
 
-                        if (castlingP !=null ){
+                            //troca de turno
+                            trocaDeTurno();
+                        }*/
+
+
+                        if (castlingP != null) {
                             castlingP.updatePosition();
                         }
                         //atualiza posição da peça ativa
                         activeP.updatePosition();
-                        copyPecas(simPecas,pecas);
-
+                        copyPecas(simPecas, pecas);
 
                         // Verifica e promove o peão, se aplicável
                         handlePeaoPromotion(activeP);
 
                         //troca de turno
                         trocaDeTurno();
+
 
                     } else {
                         //reseta a posição se for invalido
@@ -181,6 +191,104 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+
+    private boolean isReiEstaEnCheck() {
+        Pecas rei = getRei(false); // Obtém o rei do jogador atual
+        if (rei == null) return false; // Evita NullPointerException
+
+        for (Pecas p : simPecas) {
+            if (p.color != currentColor && p.canMove(rei.col, rei.row)) {
+                checkingP = p; // Atualiza a peça que está dando o cheque
+                return true;
+            }
+        }
+        checkingP = null;
+        return false;
+    }
+
+    private boolean isCheckmate() {
+        if (!isReiEstaEnCheck()) {
+            return false; // Se o rei não está em cheque, não é xeque-mate
+        }
+
+        Pecas rei = getRei(false);
+        if (rei == null) return true; // Se o rei foi capturado, é xeque-mate
+
+        // Verifica se o rei pode escapar
+        int[] movimentosX = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int[] movimentosY = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+        for (int i = 0; i < 8; i++) {
+            int novaCol = rei.col + movimentosX[i];
+            int novaRow = rei.row + movimentosY[i];
+
+            if (novaCol >= 0 && novaCol < 8 && novaRow >= 0 && novaRow < 8) {
+                if (!isIllegal(new Rei(rei.color, novaCol, novaRow))) {
+                    return false; // Se o rei pode se mover para um local seguro, não é xeque-mate
+                }
+            }
+        }
+
+        // Verifica se alguma peça pode bloquear o cheque ou capturar a peça atacante
+        for (Pecas p : simPecas) {
+            if (p.color == currentColor) {
+                for (int col = 0; col < 8; col++) {
+                    for (int row = 0; row < 8; row++) {
+                        if (p.canMove(col, row)) {
+                            Pecas capturada = getPecaNaPosicao(col, row);
+                            simPecas.remove(capturada); // Simula a captura
+
+                            int prevCol = p.col, prevRow = p.row;
+                            p.col = col;
+                            p.row = row;
+
+                            boolean aindaEmCheck = isReiEstaEnCheck();
+
+                            // Reverte a simulação
+                            p.col = prevCol;
+                            p.row = prevRow;
+                            if (capturada != null) {
+                                simPecas.add(capturada);
+                            }
+
+                            if (!aindaEmCheck) {
+                                return false; // Se existe um movimento que tira o rei do cheque, não é xeque-mate
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true; // Se nada puder ser feito para salvar o rei, é xeque-mate
+    }
+    private Pecas getPecaNaPosicao(int col, int row) {
+        for (Pecas p : simPecas) {
+            if (p.col == col && p.row == row) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+
+    private Pecas getRei(boolean oponente) {
+        Pecas rei = null;
+        for (Pecas p : simPecas) {
+            if (oponente) {
+                if (p.tipo == Tipo.Rei && p.color != currentColor) {
+                    rei = p;
+                }
+            } else {
+                if (p.tipo == Tipo.Rei && p.color == currentColor) {
+                    rei = p;
+                }
+            }
+        }
+
+        return rei;
+    }
+
     private void handlePeaoPromotion(Pecas peao) {
         if (!(peao instanceof Peao)) return; // Verifica se é um Peão
 
@@ -220,10 +328,10 @@ public class GamePanel extends JPanel implements Runnable {
         copyPecas(simPecas, pecas);
 
         //reseta o castling
-        if (castlingP != null){
+        if (castlingP != null) {
             castlingP.col = castlingP.preCol;
-            castlingP.x =castlingP.getX(castlingP.col);
-            castlingP = null ;
+            castlingP.x = castlingP.getX(castlingP.col);
+            castlingP = null;
         }
 
         //se o jogador soltou , atualiza a posição
@@ -233,21 +341,22 @@ public class GamePanel extends JPanel implements Runnable {
         activeP.row = activeP.getRow(activeP.y);
 
         //checando se a peça foi solta no quadrado
-        if(activeP.canMove(activeP.col,activeP.row)){
+        if (activeP.canMove(activeP.col, activeP.row)) {
 
-            canMove = true ;
-            validSquare = true ;
+            canMove = true;
+            validSquare = true;
             checkCastling();
 
-            if (isIllegal(activeP)==false){
-                validSquare = true ;
+            if (isIllegal(activeP) == false) {
+                validSquare = true;
             }
         }
     }
-    public boolean isIllegal(Pecas rei){
-        if (rei.tipo == Tipo.Rei){
-            for (Pecas p : simPecas){
-                if (p != rei && p.color != rei.color && p.canMove(rei.col,rei.row)){
+
+    public boolean isIllegal(Pecas rei) {
+        if (rei.tipo == Tipo.Rei) {
+            for (Pecas p : simPecas) {
+                if (p != rei && p.color != rei.color && p.canMove(rei.col, rei.row)) {
                     return true;
                 }
             }
@@ -255,36 +364,35 @@ public class GamePanel extends JPanel implements Runnable {
         return false;
     }
 
-    private void trocaDeTurno (){
-        if ( currentColor == White){
-            currentColor = Black ;
+    private void trocaDeTurno() {
+        if (currentColor == White) {
+            currentColor = Black;
             //resetando as peças pretas no en passant
-            for (Pecas p : pecas){
-                if (p.color ==Black){
+            for (Pecas p : pecas) {
+                if (p.color == Black) {
                     p.duasCasas = false;
                 }
             }
-        }else {
+        } else {
             currentColor = White;
 
             //resetando as peças brancas no en passant
-            for (Pecas p : pecas){
-                if (p.color ==White){
+            for (Pecas p : pecas) {
+                if (p.color == White) {
                     p.duasCasas = false;
                 }
             }
 
         }
-        activeP =null ;
+        activeP = null;
     }
 
-    private void checkCastling(){
-        if (castlingP != null){
-            if (castlingP.col == 0){
-                castlingP.col +=3 ;
-            }
-            else if (castlingP.col == 7){
-                castlingP.col -= 2 ;
+    private void checkCastling() {
+        if (castlingP != null) {
+            if (castlingP.col == 0) {
+                castlingP.col += 3;
+            } else if (castlingP.col == 7) {
+                castlingP.col -= 2;
             }
             castlingP.x = castlingP.getX(castlingP.col);
         }
@@ -293,7 +401,6 @@ public class GamePanel extends JPanel implements Runnable {
     //o paintComponet lida com tudo que é desenhavel no programa
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2 = (Graphics2D) g;
 
         // Desenha o tabuleiro
@@ -303,40 +410,47 @@ public class GamePanel extends JPanel implements Runnable {
         for (Pecas p : simPecas) {
             p.draw(g2);
         }
+
         if (activeP != null) {
-            if (canMove){
-                if (isIllegal(activeP)){  g2.setColor(Color.GRAY);
+            if (canMove) {
+                if (isIllegal(activeP)) {
+                    g2.setColor(Color.GRAY);
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
                     g2.fillRect(activeP.col * Tabuleiro.SQUARE_SIZE, activeP.row * Tabuleiro.SQUARE_SIZE,
                             Tabuleiro.SQUARE_SIZE, Tabuleiro.SQUARE_SIZE);
-                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));}else {g2.setColor(Color.WHITE);
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+                } else {
+                    g2.setColor(Color.WHITE);
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
                     g2.fillRect(activeP.col * Tabuleiro.SQUARE_SIZE, activeP.row * Tabuleiro.SQUARE_SIZE,
                             Tabuleiro.SQUARE_SIZE, Tabuleiro.SQUARE_SIZE);
-                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));}
-
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+                }
             }
-
-
-            //
             activeP.draw(g2);
         }
-        //marik imagem
-        ImageIcon icon = new ImageIcon(getClass().getResource("/pecas/personagens/marik200x200.png"));
-        g2.drawImage(icon.getImage(),WIDTH - 250, 20,200, 200 , null);
 
-
-
-        //status de mensagem
+        // Exibe mensagem de cheque ou xeque-mate
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setFont(new Font("Book  Antiqua", Font.ROMAN_BASELINE,40));
+        g2.setFont(new Font("Book Antiqua", Font.BOLD, 40));
         g2.setColor(Color.WHITE);
+        g2.drawString("Turno  " + (currentColor == White ? "Branco" : "Preto"), 800, 410);
 
-        if (currentColor == White){
-            g2.drawString("Turno do Branco ", 800, 410);
-        }else {
-            g2.drawString("Turno do Preto", 800,410);
+        g2.setFont(new Font("Book Antiqua", Font.BOLD, 25));
+        if (isCheckmate()) {
+            g2.setColor(Color.RED);
+            g2.drawString("XEQUE-MATE!", 800, 400);
+            g2.setFont(new Font("Book Antiqua", Font.BOLD, 20));
+            g2.drawString((currentColor == White ? "Brancos" : "Pretos") + " vencem!", 800, 500);
+        } else if (isReiEstaEnCheck()) {
+            g2.setColor(Color.RED);
+            g2.drawString("XEQUE!", 800, 450);
+            g2.setFont(new Font("Book Antiqua", Font.BOLD, 22));
+            g2.drawString("O rei " + (currentColor == White ? "branco" : "preto") + " está em cheque!", 800, 475);
         }
 
+       /*//marik imagem
+        ImageIcon icon = new ImageIcon(getClass().getResource("/pecas/personagens/marik200x200.png"));
+        g2.drawImage(icon.getImage(),WIDTH - 250, 20,200, 200 , null);*/
     }
 }
