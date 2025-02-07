@@ -54,22 +54,22 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setPecas() {
         //time branco
-        //  pecas.add(new Peao(White, 0, 6));
-        // pecas.add(new Peao(White, 1, 6));
-        // pecas.add(new Peao(White, 2, 6));
-        // pecas.add(new Peao(White, 3, 6));
-        // pecas.add(new Peao(White, 4, 6));
-        // pecas.add(new Peao(White, 5, 6));
-        //  pecas.add(new Peao(White, 6, 6));
+        pecas.add(new Peao(White, 0, 6));
+        pecas.add(new Peao(White, 1, 6));
+        pecas.add(new Peao(White, 2, 6));
+        pecas.add(new Peao(White, 3, 6));
+        pecas.add(new Peao(White, 4, 6));
+        pecas.add(new Peao(White, 5, 6));
+        pecas.add(new Peao(White, 6, 6));
         pecas.add(new Peao(White, 7, 6));
-        //  pecas.add(new Torre(White, 0, 7));
-        // pecas.add(new Torre(White, 7, 7));
-        //  pecas.add(new Cavalo(White, 1, 7));
-        //  pecas.add(new Cavalo(White, 6, 7));
-        //   pecas.add(new Bispo(White, 5, 7));
-        //  pecas.add(new Bispo(White, 2, 7));
-        //  pecas.add(new Rainha(White, 3, 7));
-        pecas.add(new Rei(White, 3, 7));
+        pecas.add(new Torre(White, 0, 7));
+        pecas.add(new Torre(White, 7, 7));
+        pecas.add(new Cavalo(White, 1, 7));
+        pecas.add(new Cavalo(White, 6, 7));
+        pecas.add(new Bispo(White, 5, 7));
+        pecas.add(new Bispo(White, 2, 7));
+        pecas.add(new Rainha(White, 3, 7));
+        pecas.add(new Rei(White, 4, 7));
 
 
         //time preto
@@ -86,8 +86,8 @@ public class GamePanel extends JPanel implements Runnable {
         pecas.add(new Cavalo(Black, 1, 0));
         pecas.add(new Cavalo(Black, 6, 0));
         pecas.add(new Bispo(Black, 5, 0));
-        pecas.add(new Bispo(Black, 1, 4));
-        pecas.add(new Rainha(Black, 4, 5));
+        pecas.add(new Bispo(Black, 2    , 0));
+        pecas.add(new Rainha(Black, 3, 0));
         pecas.add(new Rei(Black, 4, 0));
     }
 
@@ -100,29 +100,23 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     //para poder implementar o Runnable tem que ter o metodo run
+
     @Override
     public void run() {
-        //Game loop
-        double drawInterval = 1000000000 / FPS;
+        double drawInterval = 1_000_000_000.0 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
 
-        while (gameThread != null) {
-            currentTime = System.nanoTime();// Captura o tempo atual em nanossegundos
-
-            // Calcula o tempo decorrido desde o último ciclo e acumula no delta
-            // Esse valor indica o quanto estamos "atrasados" para o próximo quadro
+        // Enquanto o jogo não acabou e o thread estiver ativo
+        while (!gameover && gameThread != null) {
+            currentTime = System.nanoTime(); // Captura o tempo atual
             delta += (currentTime - lastTime) / drawInterval;
-            lastTime = currentTime; // Atualiza o lastTime para o tempo atual, para a próxima iteração
+            lastTime = currentTime;
 
-            // Se o delta for maior ou igual a 1, significa que já é hora de processar o próximo quadro.
             if (delta >= 1) {
-                update();//aqui ele atualiza o jogo a cada movimento de peças
-                repaint();//aqui desenha o jogo com a autualização
-
-                // Reduz o delta em 1, para ajustar o tempo acumulado
-                // Isso garante que o loop fique sincronizado com o FPS
+                update();   // Atualiza a lógica do jogo
+                repaint();  // Redesenha o jogo
                 delta--;
             }
         }
@@ -130,67 +124,63 @@ public class GamePanel extends JPanel implements Runnable {
 
     //aqui sera atualização das informações das posiçoes ou do número de peças que tem no Tabuleiro
     private void update() {
+        // Se o jogo já terminou, não processa novos movimentos
+        if (gameover) {
+            return;
+        }
+
         if (mouse.clicar) {
             if (activeP == null) {
-                for (Pecas pecas : simPecas) {
-                    if (pecas.color == currentColor &&
-                            pecas.col == mouse.x / Tabuleiro.SQUARE_SIZE &&
-                            pecas.row == mouse.y / Tabuleiro.SQUARE_SIZE) {
-                        activeP = pecas;
+                // Seleciona a peça ativa conforme a posição do mouse
+                for (Pecas p : simPecas) {
+                    if (p.color == currentColor &&
+                            p.col == mouse.x / Tabuleiro.SQUARE_SIZE &&
+                            p.row == mouse.y / Tabuleiro.SQUARE_SIZE) {
+                        activeP = p;
                     }
                 }
             } else {
-                // se um jogador esta segurando a peça , simula o movimento
-                //seria uma fase de pensamento antes de soltar para jogar
+                // Simula o movimento enquanto o jogador arrasta a peça
                 simulate();
             }
         } else {
-            //soltando o mouse
-            if (mouse.clicar == false) {
-                if (activeP != null) {
-                    if (validSquare) {
-                        // captura a peça
-                        if (activeP.hittingP != null) {
-                            simPecas.remove(activeP.hittingP.getIndex());
-                            activeP.hittingP = null;
-                        }
-                        if (isReiEstaEnCheck()) {
-                        }
-                        //TODO : possivel game over
-                        /*}else {
-                            // Verifica e promove o peão, se aplicável
-                            handlePeaoPromotion(activeP);
-
-                            //troca de turno
-                            trocaDeTurno();
-                        }*/
-
-
-                        if (castlingP != null) {
-                            castlingP.updatePosition();
-                        }
-                        //atualiza posição da peça ativa
-                        activeP.updatePosition();
-                        copyPecas(simPecas, pecas);
-
-                        // Verifica e promove o peão, se aplicável
-                        handlePeaoPromotion(activeP);
-
-                        //troca de turno
-                        trocaDeTurno();
-
-
-                    } else {
-                        //reseta a posição se for invalido
-                        copyPecas(simPecas, pecas);
-                        activeP.resetPosition();
-
+            // Quando o mouse é solto
+            if (activeP != null) {
+                if (validSquare) {
+                    // Se houver peça a ser capturada, remove-a
+                    if (activeP.hittingP != null) {
+                        simPecas.remove(activeP.hittingP.getIndex());
+                        activeP.hittingP = null;
                     }
-                    activeP = null;
+
+                    if (castlingP != null) {
+                        castlingP.updatePosition();
+                    }
+
+                    // Atualiza a posição da peça ativa e copia o estado simulado para o estado real
+                    activeP.updatePosition();
+                    copyPecas(simPecas, pecas);
+
+                    // Verifica e promove o peão, se aplicável
+                    handlePeaoPromotion(activeP);
+
+                    // Troca de turno
+                    trocaDeTurno();
+
+                    // Verifica se, após a jogada, o rei está em xeque-mate.
+                    if (isCheckmate()) {
+                        gameover = true;
+                    }
+                } else {
+                    // Se a jogada não foi válida, reseta a posição da peça
+                    copyPecas(simPecas, pecas);
+                    activeP.resetPosition();
                 }
+                activeP = null;
             }
         }
     }
+
 
     private boolean isReiEstaEnCheck() {
         Pecas rei = getRei(false); // Obtém o rei do jogador atual
@@ -207,52 +197,52 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private boolean isCheckmate() {
+        // Se o rei não está em xeque, não é xeque-mate.
         if (!isReiEstaEnCheck()) {
-            return false; // Se o rei não está em cheque, não é xeque-mate
+            return false;
         }
 
+        // Obtemos o rei do jogador atual.
         Pecas rei = getRei(false);
-        if (rei == null) return true; // Se o rei foi capturado, é xeque-mate
+        if (rei == null) return true; // Se o rei foi capturado, é xeque-mate.
 
-        // Verifica se o rei pode escapar
-        int[] movimentosX = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] movimentosY = {-1, 0, 1, -1, 1, -1, 0, 1};
-
-        for (int i = 0; i < 8; i++) {
-            int novaCol = rei.col + movimentosX[i];
-            int novaRow = rei.row + movimentosY[i];
-
-            if (novaCol >= 0 && novaCol < 8 && novaRow >= 0 && novaRow < 8) {
-                if (!isIllegal(new Rei(rei.color, novaCol, novaRow))) {
-                    return false; // Se o rei pode se mover para um local seguro, não é xeque-mate
-                }
-            }
-        }
-
-        // Verifica se alguma peça pode bloquear o cheque ou capturar a peça atacante
+        // Para cada peça da cor atual, testamos todos os movimentos possíveis.
         for (Pecas p : simPecas) {
             if (p.color == currentColor) {
+                // Percorre todas as casas do tabuleiro.
                 for (int col = 0; col < 8; col++) {
                     for (int row = 0; row < 8; row++) {
+                        // Se a peça pode mover para (col, row)
                         if (p.canMove(col, row)) {
-                            Pecas capturada = getPecaNaPosicao(col, row);
-                            simPecas.remove(capturada); // Simula a captura
+                            // Salva a posição original.
+                            int origCol = p.col;
+                            int origRow = p.row;
 
-                            int prevCol = p.col, prevRow = p.row;
+                            // Verifica se há alguma peça na casa destino e simula sua captura.
+                            Pecas capturada = getPecaNaPosicao(col, row);
+                            if (capturada != null) {
+                                simPecas.remove(capturada);
+                            }
+
+                            // Simula o movimento: atualiza a posição da peça candidata.
                             p.col = col;
                             p.row = row;
 
+                            // Verifica se o rei ainda está em xeque após essa simulação.
                             boolean aindaEmCheck = isReiEstaEnCheck();
 
-                            // Reverte a simulação
-                            p.col = prevCol;
-                            p.row = prevRow;
+                            // Reverte o movimento: restaura a posição original.
+                            p.col = origCol;
+                            p.row = origRow;
+
+                            // Se uma peça foi capturada, re-adiciona-a.
                             if (capturada != null) {
                                 simPecas.add(capturada);
                             }
 
+                            // Se após o movimento o rei NÃO está em xeque, então ainda há um movimento legal.
                             if (!aindaEmCheck) {
-                                return false; // Se existe um movimento que tira o rei do cheque, não é xeque-mate
+                                return false;
                             }
                         }
                     }
@@ -260,8 +250,10 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        return true; // Se nada puder ser feito para salvar o rei, é xeque-mate
+        // Se nenhum movimento salvar o rei, é xeque-mate.
+        return true;
     }
+
     private Pecas getPecaNaPosicao(int col, int row) {
         for (Pecas p : simPecas) {
             if (p.col == col && p.row == row) {
@@ -439,14 +431,14 @@ public class GamePanel extends JPanel implements Runnable {
         g2.setFont(new Font("Book Antiqua", Font.BOLD, 25));
         if (isCheckmate()) {
             g2.setColor(Color.RED);
-            g2.drawString("XEQUE-MATE!", 800, 400);
+            g2.drawString("XEQUE-MATE!", 800, 450);
             g2.setFont(new Font("Book Antiqua", Font.BOLD, 20));
-            g2.drawString((currentColor == White ? "Brancos" : "Pretos") + " vencem!", 800, 500);
+            g2.drawString((currentColor == White ? "Pretos" : "Brancos") + " vencem!", 800, 475);
         } else if (isReiEstaEnCheck()) {
             g2.setColor(Color.RED);
             g2.drawString("XEQUE!", 800, 450);
             g2.setFont(new Font("Book Antiqua", Font.BOLD, 22));
-            g2.drawString("O rei " + (currentColor == White ? "branco" : "preto") + " está em cheque!", 800, 475);
+            g2.drawString("O rei " + (currentColor == White ? "Branco" : "preto") + " está em cheque!", 800, 475);
         }
 
        /*//marik imagem
