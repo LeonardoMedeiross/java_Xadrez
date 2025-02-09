@@ -54,7 +54,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setPecas() {
         //time branco
-        pecas.add(new Peao(White, 0, 6));
+      /*  pecas.add(new Peao(White, 0, 6));
         pecas.add(new Peao(White, 1, 6));
         pecas.add(new Peao(White, 2, 6));
         pecas.add(new Peao(White, 3, 6));
@@ -68,19 +68,19 @@ public class GamePanel extends JPanel implements Runnable {
         pecas.add(new Cavalo(White, 6, 7));
         pecas.add(new Bispo(White, 5, 7));
         pecas.add(new Bispo(White, 2, 7));
-        pecas.add(new Rainha(White, 3, 7));
+        pecas.add(new Rainha(White, 3, 7));*/
         pecas.add(new Rei(White, 4, 7));
 
 
         //time preto
-        pecas.add(new Peao(Black, 0, 1));
+       /* pecas.add(new Peao(Black, 0, 1));
         pecas.add(new Peao(Black, 1, 1));
         pecas.add(new Peao(Black, 2, 1));
         pecas.add(new Peao(Black, 3, 1));
         pecas.add(new Peao(Black, 4, 1));
         pecas.add(new Peao(Black, 5, 1));
         pecas.add(new Peao(Black, 6, 1));
-        pecas.add(new Peao(Black, 7, 1));
+        pecas.add(new Peao(Black, 7, 1));*/
         pecas.add(new Torre(Black, 0, 0));
         pecas.add(new Torre(Black, 7, 0));
         pecas.add(new Cavalo(Black, 1, 0));
@@ -170,7 +170,10 @@ public class GamePanel extends JPanel implements Runnable {
                     // Verifica se, após a jogada, o rei está em xeque-mate.
                     if (isCheckmate()) {
                         gameover = true;
+                    }else if (isStalemate()) {
+                        gameover = true;
                     }
+
                 } else {
                     // Se a jogada não foi válida, reseta a posição da peça
                     copyPecas(simPecas, pecas);
@@ -253,6 +256,24 @@ public class GamePanel extends JPanel implements Runnable {
         // Se nenhum movimento salvar o rei, é xeque-mate.
         return true;
     }
+    private boolean isStalemate() {
+        if (isReiEstaEnCheck()) return false;
+        for (Pecas p : simPecas) {
+            if (p.color == currentColor) {
+                for (int col = 0; col < 8; col++) {
+                    for (int row = 0; row < 8; row++) {
+                        if (p.canMove(col, row)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        gameover=true ;
+        return true;
+    }
+
+
 
     private Pecas getPecaNaPosicao(int col, int row) {
         for (Pecas p : simPecas) {
